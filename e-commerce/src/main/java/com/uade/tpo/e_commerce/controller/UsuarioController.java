@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-
+// @RestController indica que esta clase es un controlador de Spring, lo que permite manejar solicitudes HTTP
+// @RequestMapping("/api/usuarios") define la ruta base para todas las solicitudes de este controlador
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {

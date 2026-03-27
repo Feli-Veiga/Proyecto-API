@@ -10,6 +10,8 @@ import com.uade.tpo.e_commerce.repository.UsuarioRepository;
 
 import jakarta.transaction.Transactional;
 
+// @Service indica que esta clase es un servicio de Spring, lo que permite que sea inyectada en otras partes del código
+// @Transactional asegura consitencia, atomicidad e integridad en las operaciones de la base de datos, si algo falla se revierte todo
 @Service
 @Transactional
 public class UsuarioService {
