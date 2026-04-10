@@ -1,5 +1,6 @@
 package com.uade.tpo.e_commerce.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -31,7 +32,14 @@ public class Usuario {
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
+
+    @Column(name = "fecha_nacimiento", nullable = false)
+    private LocalDate fechaNacimiento;
+
+    @Column(nullable = false)
+    private String sexo;
 
     // Un usuario puede tener muchos productos
     // @OneToMany -> relación uno a muchos
