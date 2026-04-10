@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class GolbalExceptionHandler {
+public class GlobalExceptionHandler {
     
     @ExceptionHandler(UsuarioNotFoundException.class)
     public ResponseEntity<String> handleUsuarioNotFound(UsuarioNotFoundException ex) {
