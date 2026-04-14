@@ -17,9 +17,9 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // Devuelve todos los productos
+    // Devuelve todos los productos ordenados por nombre
     public List<Producto> getAllProductos() {
-        return productoRepository.findAll();
+        return productoRepository.findAllByOrderByNombreAsc();
     }
 
     // Devuelve un producto por su id

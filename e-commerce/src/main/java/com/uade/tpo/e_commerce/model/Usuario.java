@@ -2,7 +2,8 @@ package com.uade.tpo.e_commerce.model;
 
 import java.time.LocalDate;
 import java.util.List;
-
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +21,9 @@ import lombok.Data;
 @Table(name = "usuarios")
 public class Usuario {
     // Definimos el ID como clave primaria
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @Id
     // Generamos el ID automáticamente auto-incremental
     @GeneratedValue(strategy = GenerationType.IDENTITY)
