@@ -2,6 +2,7 @@ package com.uade.tpo.e_commerce.service;
 
 import java.util.ArrayList;
 
+import com.uade.tpo.e_commerce.model.Usuario;
 import com.uade.tpo.e_commerce.repository.ItemCarritoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -123,5 +124,13 @@ public class CarritoService {
                                 * item.getCantidad()
                 )
                 .sum();
+    }
+    public Carrito crearCarritoParaUsuario(Usuario usuario) {
+
+        Carrito carrito = new Carrito();
+        carrito.setUsuario(usuario);
+        carrito.setItems(new java.util.ArrayList<>());
+
+        return carritoRepository.save(carrito);
     }
 }

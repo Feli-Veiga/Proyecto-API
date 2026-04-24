@@ -3,11 +3,12 @@ package com.uade.tpo.e_commerce.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.uade.tpo.e_commerce.dto.LoginRequest;
+import com.uade.tpo.e_commerce.dto.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.uade.tpo.e_commerce.dto.LoginRequest;
 import com.uade.tpo.e_commerce.dto.UsuarioRequestDTO;
 import com.uade.tpo.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.tpo.e_commerce.exception.DatosInvalidosException;
@@ -63,8 +64,7 @@ public class UsuarioService {
 
     public Usuario getUsuarioById(Long id) {
 
-        return usuarioRepository
-                .findById(id)
+        return usuarioRepository.findById(id)
                 .orElseThrow(() ->
                         new UsuarioNotFoundException(
                                 "Usuario no encontrado con ID: " + id));
@@ -74,16 +74,12 @@ public class UsuarioService {
     // REGISTER
     // =============================
 
-    public UsuarioResponseDTO registerUsuario(
-            UsuarioRequestDTO request) {
+    public UsuarioResponseDTO registerUsuario(UsuarioRequestDTO request) {
 
         validateRequest(request);
 
-        if (usuarioRepository.existsByEmail(
-                request.getEmail())) {
-
-            throw new DatosInvalidosException(
-                    "El email ya está registrado");
+        if (usuarioRepository.existsByEmail(request.getEmail())) {
+            throw new DatosInvalidosException("El email ya está registrado");
         }
 
         Usuario usuario = new Usuario();
@@ -91,21 +87,12 @@ public class UsuarioService {
         usuario.setNombre(request.getNombre());
         usuario.setApellido(request.getApellido());
         usuario.setEmail(request.getEmail());
-
-        usuario.setPassword(
-                passwordEncoder.encode(
-                        request.getPassword())
-        );
-
-        usuario.setFechaNacimiento(
-                request.getFechaNacimiento());
-
+        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        usuario.setFechaNacimiento(request.getFechaNacimiento());
         usuario.setSexo(request.getSexo());
-
         usuario.setRole(Role.USER);
 
-        Usuario guardado =
-                usuarioRepository.save(usuario);
+        Usuario guardado = usuarioRepository.save(usuario);
 
         return toResponseDTO(guardado);
     }
@@ -114,56 +101,41 @@ public class UsuarioService {
     // VALIDATION
     // =============================
 
-    private void validateRequest(
-            UsuarioRequestDTO request) {
+    private void validateRequest(UsuarioRequestDTO request) {
 
         if (request == null) {
-            throw new DatosInvalidosException(
-                    "La información del usuario es obligatoria");
+            throw new DatosInvalidosException("La información del usuario es obligatoria");
         }
 
-        if (request.getNombre() == null
-                || request.getNombre().isBlank()) {
-            throw new DatosInvalidosException(
-                    "El nombre es obligatorio");
+        if (request.getNombre() == null || request.getNombre().isBlank()) {
+            throw new DatosInvalidosException("El nombre es obligatorio");
         }
 
-        if (request.getApellido() == null
-                || request.getApellido().isBlank()) {
-            throw new DatosInvalidosException(
-                    "El apellido es obligatorio");
+        if (request.getApellido() == null || request.getApellido().isBlank()) {
+            throw new DatosInvalidosException("El apellido es obligatorio");
         }
 
-        if (request.getEmail() == null
-                || request.getEmail().isBlank()) {
-            throw new DatosInvalidosException(
-                    "El email es obligatorio");
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new DatosInvalidosException("El email es obligatorio");
         }
 
-        if (request.getPassword() == null
-                || request.getPassword().isBlank()) {
-            throw new DatosInvalidosException(
-                    "La contraseña es obligatoria");
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new DatosInvalidosException("La contraseña es obligatoria");
         }
 
         if (request.getFechaNacimiento() == null) {
-            throw new DatosInvalidosException(
-                    "La fecha de nacimiento es obligatoria");
+            throw new DatosInvalidosException("La fecha de nacimiento es obligatoria");
         }
 
         LocalDate fechaNacimiento = request.getFechaNacimiento();
-        LocalDate fechaActual = LocalDate.now();
-        int edadCalculada = fechaActual.getYear() - fechaNacimiento.getYear();
+        int edad = LocalDate.now().getYear() - fechaNacimiento.getYear();
 
-        if (edadCalculada < 18) {
-            throw new DatosInvalidosException(
-                    "Debes ser mayor de 18 años para registrarte");
+        if (edad < 18) {
+            throw new DatosInvalidosException("Debes ser mayor de 18 años para registrarte");
         }
 
-        if (request.getSexo() == null
-                || request.getSexo().isBlank()) {
-            throw new DatosInvalidosException(
-                    "El sexo es obligatorio");
+        if (request.getSexo() == null || request.getSexo().isBlank()) {
+            throw new DatosInvalidosException("El sexo es obligatorio");
         }
     }
 
@@ -174,9 +146,7 @@ public class UsuarioService {
     public void deleteUsuarioById(Long id) {
 
         if (!usuarioRepository.existsById(id)) {
-
-            throw new UsuarioNotFoundException(
-                    "Usuario no encontrado con ID: " + id);
+            throw new UsuarioNotFoundException("Usuario no encontrado con ID: " + id);
         }
 
         usuarioRepository.deleteById(id);
@@ -186,41 +156,26 @@ public class UsuarioService {
     // LOGIN
     // =============================
 
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
-        if (request == null) {
-            throw new DatosInvalidosException(
-                    "Datos de login obligatorios");
+        if (request == null ||
+                request.getEmail() == null || request.getEmail().isBlank() ||
+                request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new DatosInvalidosException("Email y contraseña son obligatorios");
         }
 
-        if (request.getEmail() == null
-                || request.getEmail().isBlank()) {
-            throw new DatosInvalidosException(
-                    "El email es obligatorio");
+        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new DatosInvalidosException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+            throw new DatosInvalidosException("Password incorrecto");
         }
 
-        if (request.getPassword() == null
-                || request.getPassword().isBlank()) {
-            throw new DatosInvalidosException(
-                    "La contraseña es obligatoria");
-        }
+        String token = jwtService.generateToken(usuario.getEmail());
 
-        Usuario usuario = usuarioRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() ->
-                        new DatosInvalidosException(
-                                "Usuario no encontrado"));
+        LoginResponse response = new LoginResponse();
+        response.setToken(token);
 
-        if (!passwordEncoder.matches(
-                request.getPassword(),
-                usuario.getPassword())) {
-
-            throw new DatosInvalidosException(
-                    "Password incorrecto");
-        }
-
-        return jwtService.generateToken(
-                usuario.getEmail());
+        return response;
     }
-
 }
