@@ -1,7 +1,7 @@
 package com.uade.tpo.e_commerce.controller;
 
 import com.uade.tpo.e_commerce.model.Categoria;
-import com.uade.tpo.e_commerce.repository.CategoriaRepository;
+import com.uade.tpo.e_commerce.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -11,15 +11,15 @@ import java.util.List;
 public class CategoriaController {
 
     @Autowired
-    private CategoriaRepository categoriaRepository;
+    private CategoriaService categoriaService;
 
     @GetMapping
     public List<Categoria> getAll() {
-        return categoriaRepository.findAll();
+        return categoriaService.getAllCategorias();
     }
 
     @PostMapping
     public Categoria create(@RequestBody Categoria categoria) {
-        return categoriaRepository.save(categoria);
+        return categoriaService.saveCategoria(categoria);
     }
 }
