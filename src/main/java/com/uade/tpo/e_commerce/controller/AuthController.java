@@ -7,7 +7,7 @@ import com.uade.tpo.e_commerce.dto.LoginRequest;
 import com.uade.tpo.e_commerce.service.UsuarioService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired

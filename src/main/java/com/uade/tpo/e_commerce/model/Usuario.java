@@ -34,6 +34,9 @@ public class Usuario {
     private String nombre;
 
     @Column(nullable = false)
+    private String apellido;
+
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)

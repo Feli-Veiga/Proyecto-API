@@ -1,5 +1,6 @@
 package com.uade.tpo.e_commerce.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,7 @@ public class UsuarioService {
 
         dto.setId(usuario.getId());
         dto.setNombre(usuario.getNombre());
+        dto.setApellido(usuario.getApellido());
         dto.setEmail(usuario.getEmail());
         dto.setFechaNacimiento(usuario.getFechaNacimiento());
         dto.setSexo(usuario.getSexo());
@@ -87,6 +89,7 @@ public class UsuarioService {
         Usuario usuario = new Usuario();
 
         usuario.setNombre(request.getNombre());
+        usuario.setApellido(request.getApellido());
         usuario.setEmail(request.getEmail());
 
         usuario.setPassword(
@@ -125,6 +128,12 @@ public class UsuarioService {
                     "El nombre es obligatorio");
         }
 
+        if (request.getApellido() == null
+                || request.getApellido().isBlank()) {
+            throw new DatosInvalidosException(
+                    "El apellido es obligatorio");
+        }
+
         if (request.getEmail() == null
                 || request.getEmail().isBlank()) {
             throw new DatosInvalidosException(
@@ -140,6 +149,15 @@ public class UsuarioService {
         if (request.getFechaNacimiento() == null) {
             throw new DatosInvalidosException(
                     "La fecha de nacimiento es obligatoria");
+        }
+
+        LocalDate fechaNacimiento = request.getFechaNacimiento();
+        LocalDate fechaActual = LocalDate.now();
+        int edadCalculada = fechaActual.getYear() - fechaNacimiento.getYear();
+
+        if (edadCalculada < 18) {
+            throw new DatosInvalidosException(
+                    "Debes ser mayor de 18 años para registrarte");
         }
 
         if (request.getSexo() == null

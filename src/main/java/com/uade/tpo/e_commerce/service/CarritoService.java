@@ -6,6 +6,7 @@ import com.uade.tpo.e_commerce.repository.ItemCarritoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.e_commerce.exception.DatosInvalidosException;
 import com.uade.tpo.e_commerce.model.Carrito;
 import com.uade.tpo.e_commerce.model.ItemCarrito;
 import com.uade.tpo.e_commerce.model.Producto;
@@ -55,17 +56,19 @@ public class CarritoService {
 
     public void checkout(Long carritoId) {
 
-        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
+        Carrito carrito = carritoRepository.findById(carritoId).orElseThrow(()-> new RuntimeException("Carrito no encontrado"));
 
         for (ItemCarrito item : carrito.getItems()) {
 
             Producto producto = item.getProducto();
 
             if (producto.getStock() < item.getCantidad()) {
-                throw new RuntimeException("Sin stock");
+                throw new DatosInvalidosException("Producto " + producto.getNombre() + " sin stock suficiente");
             }
 
             producto.setStock(producto.getStock() - item.getCantidad());
+
+            productoRepository.save(producto);
         }
 
         carrito.getItems().clear();

@@ -10,6 +10,7 @@ import lombok.Data;
 public class UsuarioRequestDTO {
     
     private String nombre;
+    private String apellido;
     private String email;
     private String password;
     private LocalDate fechaNacimiento;

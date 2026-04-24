@@ -1,6 +1,7 @@
 package com.uade.tpo.e_commerce.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.uade.tpo.e_commerce.model.Carrito;
@@ -40,5 +41,11 @@ public class CarritoController {
         return carritoService.calcularTotal(
                 carritoId
         );
+    }
+
+    @PostMapping("/{carritoId}/checkout")
+    public ResponseEntity<String> checkout(@PathVariable Long carritoId) {
+        carritoService.checkout(carritoId);
+        return ResponseEntity.ok("Compra realizada con éxito y stock actualizado");
     }
 }

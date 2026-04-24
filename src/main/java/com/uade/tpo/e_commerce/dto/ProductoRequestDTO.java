@@ -9,6 +9,8 @@ public class ProductoRequestDTO {
     private String nombre;
     private String descripcion;
     private double precio;
+    private int stock;
     // id del usuario al que pertenece el producto
     private Long usuarioId;
+    private String categoriaId;
 }
