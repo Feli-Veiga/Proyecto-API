@@ -3,6 +3,7 @@ package com.uade.tpo.e_commerce.config;
 import com.uade.tpo.e_commerce.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -18,12 +19,20 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-
+                        // Endpoints públicos de autenticación y registro
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/usuarios").permitAll()
-                        .requestMatchers("/api/productos/**").authenticated()
+
+                        // PRODUCTOS: Solo lectura pública, el resto requiere token
+                        .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/productos/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/productos/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**").authenticated()
+
+                        // Carrito y Categorías requieren autenticación
                         .requestMatchers("/api/carrito/**").authenticated()
                         .requestMatchers("/api/categorias/**").authenticated()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
