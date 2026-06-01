@@ -14,6 +14,29 @@ public class CarritoController {
     @Autowired
     private CarritoService carritoService;
 
+    @PostMapping("/{carritoId}/producto/{productoId}")
+    public Carrito agregarProducto(
+            @PathVariable Long carritoId,
+            @PathVariable Long productoId,
+            @RequestParam Integer cantidad) {
+
+        return carritoService.agregarProducto(
+                carritoId,
+                productoId,
+                cantidad
+        );
+    }
+
+    @PostMapping
+    public Carrito crearCarrito() {
+        return carritoService.crearCarrito();
+    }
+
+    @GetMapping("/{carritoId}")
+    public Carrito getCarrito(@PathVariable Long carritoId) {
+        return carritoService.getCarritoById(carritoId);
+    }
+
     @DeleteMapping("/{carritoId}/item/{itemId}")
     public Carrito eliminarItem(
             @PathVariable Long carritoId,

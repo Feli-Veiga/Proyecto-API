@@ -37,6 +37,11 @@ public class CarritoService {
         return carritoRepository.save(carrito);
     }
 
+    public Carrito getCarritoById(Long id) {
+        return carritoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado con ID: " + id));
+    }
+
     public Carrito agregarProducto(Long carritoId, Long productoId, Integer cantidad) {
 
         Carrito carrito = carritoRepository.findById(carritoId).orElseThrow();
