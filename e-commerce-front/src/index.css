@@ -1,0 +1,274 @@
+/* 
+  E-commerce Modern Design System
+  Theme: Glassmorphism / Sleek Slate Dark Mode
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Harmonious HSL Tailored Color Palette */
+  --hue: 240;
+  
+  --bg-color: hsl(var(--hue), 20%, 8%);
+  --surface-color: hsl(var(--hue), 15%, 12%);
+  --surface-hover: hsl(var(--hue), 15%, 16%);
+  
+  --primary-color: hsl(260, 85%, 65%);
+  --primary-glow: hsla(260, 85%, 65%, 0.15);
+  
+  --accent-color: hsl(160, 80%, 45%);
+  --accent-glow: hsla(160, 80%, 45%, 0.15);
+  
+  --text-primary: hsl(var(--hue), 10%, 92%);
+  --text-secondary: hsl(var(--hue), 10%, 65%);
+  --text-muted: hsl(var(--hue), 10%, 45%);
+  
+  --border-color: hsl(var(--hue), 12%, 18%);
+  --border-glow: hsla(var(--hue), 12%, 18%, 0.5);
+  
+  --error-color: hsl(0, 85%, 60%);
+  --success-color: hsl(140, 75%, 45%);
+
+  --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius-lg: 16px;
+  --border-radius-md: 10px;
+  --border-radius-sm: 6px;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Light mode override if user prefers */
+[data-theme="light"] {
+  --bg-color: hsl(var(--hue), 15%, 97%);
+  --surface-color: hsl(0, 0%, 100%);
+  --surface-hover: hsl(var(--hue), 15%, 95%);
+  --text-primary: hsl(var(--hue), 25%, 12%);
+  --text-secondary: hsl(var(--hue), 15%, 35%);
+  --text-muted: hsl(var(--hue), 10%, 55%);
+  --border-color: hsl(var(--hue), 15%, 88%);
+  --border-glow: hsla(var(--hue), 15%, 88%, 0.5);
+  --primary-color: hsl(260, 75%, 55%);
+  --primary-glow: hsla(260, 75%, 55%, 0.1);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+/* Root Layout Container */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+p {
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+
+/* Premium Card Layout (Glassmorphism) */
+.glass-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  border-color: hsla(260, 85%, 65%, 0.4);
+  box-shadow: 0 12px 30px var(--primary-glow);
+}
+
+/* Grids & Layout Helpers */
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Interactive Forms & Controls */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.input-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.form-input {
+  background: hsl(var(--hue), 12%, 10%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 0.8rem 1rem;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Premium Buttons & Clickables */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, hsl(260, 85%, 55%) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--primary-glow);
+  opacity: 0.95;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--text-secondary);
+}
+
+.btn-danger {
+  background: var(--error-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.btn-danger:hover {
+  opacity: 0.9;
+  box-shadow: 0 4px 15px hsla(0, 85%, 60%, 0.3);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 50px;
+  background: var(--primary-glow);
+  color: var(--primary-color);
+  border: 1px solid hsla(260, 85%, 65%, 0.2);
+}
+
+.badge-success {
+  background: hsla(140, 75%, 45%, 0.15);
+  color: var(--success-color);
+  border: 1px solid hsla(140, 75%, 45%, 0.2);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .grid-auto {
+    grid-template-columns: 1fr;
+  }
+}
