@@ -19,14 +19,11 @@ function App() {
           <Header />
           <main className="main-content">
             <Routes>
-              {/* Rutas principales */}
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<ProductList />} />
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/login" element={<Login />} />
-              
-              {/* Redirección por defecto */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
