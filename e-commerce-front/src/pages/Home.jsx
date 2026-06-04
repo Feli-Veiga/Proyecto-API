@@ -15,7 +15,6 @@ const Home = () => {
         overflow: 'hidden',
         boxShadow: 'var(--shadow-lg)'
       }}>
-        {/* Glow Effects */}
         <div style={{
           position: 'absolute',
           top: '-150px',
@@ -47,6 +46,7 @@ const Home = () => {
           Explora los últimos productos electrónicos con el mejor soporte y entrega inmediata. Diseñado para tu comodidad.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          {/* Al hacer clic acá, viaja a /products y carga las listas separadas */}
           <Link to="/products" className="btn-primary" style={{ padding: '1rem 2.5rem', borderRadius: '50px' }}>
             Explorar Catálogo 🚀
           </Link>
@@ -62,10 +62,11 @@ const Home = () => {
           gap: '1.5rem'
         }}>
           {[
-            { name: 'Tecnología', icon: '💻', slug: 'tecnologia', desc: 'Computadoras, tablets y gadgets' },
-            { name: 'Audio', icon: '🎧', slug: 'audio', desc: 'Auriculares, parlantes y más' },
-            { name: 'Accesorios', icon: '🔌', slug: 'accesorios', desc: 'Cargadores, fundas y cables' },
-            { name: 'Smartphones', icon: '📱', slug: 'smartphones', desc: 'Los últimos teléfonos del mercado' }
+            /* 👇 Modificado: Nombre y slug adaptados a las descripciones reales de tu base de datos */
+            { name: 'Hogar', icon: '🏠', slug: 'Hogar', desc: 'Aires acondicionados, confort y hogar' },
+            { name: 'Tecnología', icon: '💻', slug: 'Tecnologia', desc: 'Computadoras, tablets y gadgets' },
+            { name: 'Audio', icon: '🎧', slug: 'Audio', desc: 'Auriculares, parlantes y sonido' },
+            { name: 'Electrodomésticos', icon: '🔌', slug: 'Electrodomesticos', desc: 'Cocina y artículos eléctricos' }
           ].map((cat) => (
             <Link key={cat.slug} to={`/products?categoria=${cat.slug}`} className="glass-card" style={{
               textAlign: 'center',
