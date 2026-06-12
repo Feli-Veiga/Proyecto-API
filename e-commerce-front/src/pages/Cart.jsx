@@ -5,29 +5,48 @@ import { useAuth } from '../context/AuthContext';
 
 const Cart = () => {
   const { cartItems, loading, removeFromCart, clearCart, getCartTotal, checkoutCart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [checkingOut, setCheckingOut] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [showCardForm, setShowCardForm] = useState(false);
+  const [cardData, setCardData] = useState({
+    numeroTarjeta: '',
+    cvv: '',
+    fechaVencimiento: ''
+  });
 
   const handleCheckout = async () => {
     if (!isAuthenticated) {
-      // Si no está autenticado, lo mandamos a login pero guardamos que querían ir a checkout
       navigate('/login?redirect=/cart');
       return;
     }
-    
+    setShowCardForm(true);
+  };
+
+  const handleConfirmPago = async () => {
+    setErrorMessage(null);
     setCheckingOut(true);
-    const success = await checkoutCart();
+    const success = await checkoutCart(
+      user?.id || null,
+      user?.email || '',
+      cardData.numeroTarjeta,
+      cardData.cvv,
+      cardData.fechaVencimiento
+    );
     setCheckingOut(false);
     if (success) {
-      setSuccessMessage('¡Tu compra ha sido procesada con éxito! El inventario ha sido actualizado.');
+      setShowCardForm(false);
+      setSuccessMessage('¡Tu compra ha sido procesada con éxito!');
+    } else {
+      setErrorMessage('Error al procesar el pago. Verificá los datos de tu tarjeta.');
     }
   };
 
   if (loading && cartItems.length === 0) {
     return (
-      <div style={{ padding: '3rem 0', textAlign: 'center', color: 'var(--text-secondary)' }}>
+      <div style={{ padding: '3rem 0', textAlign: 'center' }}>
         <h2>Cargando carrito...</h2>
       </div>
     );
@@ -39,9 +58,7 @@ const Cart = () => {
         <span style={{ fontSize: '4rem' }}>🎉</span>
         <h2 style={{ marginTop: '1.5rem', color: 'var(--success-color)' }}>¡Compra Exitosa!</h2>
         <p style={{ margin: '1rem 0 2rem 0', fontSize: '1.1rem' }}>{successMessage}</p>
-        <Link to="/products" className="btn-primary">
-          Seguir Comprando
-        </Link>
+        <Link to="/products" className="btn-primary">Seguir Comprando</Link>
       </div>
     );
   }
@@ -54,127 +71,83 @@ const Cart = () => {
         <div className="glass-card" style={{ padding: '4rem', textAlign: 'center' }}>
           <span style={{ fontSize: '3rem' }}>🛒</span>
           <h3 style={{ marginTop: '1rem' }}>El carrito está vacío</h3>
-          <p style={{ margin: '0.5rem 0 1.5rem 0' }}>Parece que aún no has agregado productos al carrito.</p>
+          <p style={{ margin: '0.5rem 0 1.5rem 0' }}>Aún no agregaste productos.</p>
           <Link to="/products" className="btn-primary">Ir al Catálogo</Link>
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '2rem',
-          alignItems: 'start'
-        }}>
-          {/* List of items */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', alignItems: 'start' }}>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {cartItems.map(item => (
-              <div key={item.id} className="glass-card" style={{
-                display: 'flex',
-                gap: '1rem',
-                alignItems: 'center',
-                padding: '1rem',
-                backgroundColor: 'hsl(240, 15%, 10%)'
-              }}>
-                {item.imagen ? (
-                  <img 
-                    src={item.imagen} 
-                    alt={item.nombre} 
-                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} 
-                  />
-                ) : (
-                  <div style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '8px',
-                    backgroundColor: 'var(--border-color)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '1.5rem'
-                  }}>
-                    📦
-                  </div>
-                )}
-                
+              <div key={item.id} className="glass-card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', padding: '1rem' }}>
                 <div style={{ flex: 1 }}>
-                  <h4 style={{ margin: 0, fontSize: '1rem' }}>{item.nombre}</h4>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-                    Precio unitario: ${item.precio.toLocaleString('es-AR')}
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                    Cantidad: {item.quantity}
-                  </div>
+                  <h4 style={{ margin: 0 }}>{item.nombre}</h4>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Precio: ${item.precio.toLocaleString('es-AR')}</div>
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Cantidad: {item.quantity}</div>
                 </div>
-
-                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span style={{ fontWeight: 600, fontSize: '1.1rem' }}>
-                    ${(item.precio * item.quantity).toLocaleString('es-AR')}
-                  </span>
-                  <button 
-                    onClick={() => removeFromCart(item.id)} 
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--error-color)',
-                      cursor: 'pointer',
-                      fontSize: '0.85rem',
-                      fontWeight: 500
-                    }}
-                  >
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontWeight: 600 }}>${(item.precio * item.quantity).toLocaleString('es-AR')}</span>
+                  <br />
+                  <button onClick={() => removeFromCart(item.id)} style={{ background: 'transparent', border: 'none', color: 'var(--error-color)', cursor: 'pointer', fontSize: '0.85rem' }}>
                     Eliminar
                   </button>
                 </div>
               </div>
             ))}
-
-            <button onClick={clearCart} className="btn-secondary" style={{ alignSelf: 'flex-start', color: 'var(--error-color)', borderColor: 'hsla(0, 85%, 60%, 0.2)' }}>
-              🗑️ Vaciar Carrito
-            </button>
+            <button onClick={clearCart} className="btn-secondary" style={{ alignSelf: 'flex-start' }}>🗑️ Vaciar Carrito</button>
           </div>
 
-          {/* Cart Summary */}
           <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h3>Resumen del Pedido</h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-              <div className="flex-between">
-                <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
-                <span>${getCartTotal().toLocaleString('es-AR')}</span>
-              </div>
-              <div className="flex-between">
-                <span style={{ color: 'var(--text-secondary)' }}>Envío</span>
-                <span style={{ color: 'var(--success-color)', fontWeight: 500 }}>Gratis</span>
-              </div>
-            </div>
-
             <div className="flex-between" style={{ fontSize: '1.25rem', fontWeight: 700 }}>
               <span>Total</span>
-              <span style={{ color: 'var(--text-primary)' }}>
-                ${getCartTotal().toLocaleString('es-AR')}
-              </span>
+              <span>${getCartTotal().toLocaleString('es-AR')}</span>
             </div>
 
-            {!isAuthenticated && (
-              <div style={{
-                background: 'rgba(234, 179, 8, 0.1)',
-                border: '1px solid rgba(234, 179, 8, 0.2)',
-                borderRadius: '8px',
-                padding: '0.75rem',
-                fontSize: '0.85rem',
-                color: '#eab308',
-                textAlign: 'center'
-              }}>
-                Debes iniciar sesión para realizar la compra.
+            {showCardForm && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                <h4>💳 Datos de pago</h4>
+                <input
+                  type="text"
+                  placeholder="Número de tarjeta (16 dígitos)"
+                  maxLength={16}
+                  value={cardData.numeroTarjeta}
+                  onChange={e => setCardData({ ...cardData, numeroTarjeta: e.target.value })}
+                  style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="CVV (3 dígitos)"
+                  maxLength={3}
+                  value={cardData.cvv}
+                  onChange={e => setCardData({ ...cardData, cvv: e.target.value })}
+                  style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Vencimiento (MM/AA)"
+                  maxLength={5}
+                  value={cardData.fechaVencimiento}
+                  onChange={e => setCardData({ ...cardData, fechaVencimiento: e.target.value })}
+                  style={{ padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+                />
+                {errorMessage && (
+                  <div style={{ color: 'var(--error-color)', fontSize: '0.85rem', textAlign: 'center' }}>{errorMessage}</div>
+                )}
+                <button onClick={handleConfirmPago} className="btn-primary" style={{ width: '100%', padding: '1rem' }} disabled={checkingOut}>
+                  {checkingOut ? 'Procesando...' : '✅ Confirmar Pago'}
+                </button>
+                <button onClick={() => setShowCardForm(false)} className="btn-secondary" style={{ width: '100%' }}>
+                  Cancelar
+                </button>
               </div>
             )}
 
-            <button 
-              onClick={handleCheckout} 
-              className="btn-primary" 
-              style={{ width: '100%', padding: '1rem' }}
-              disabled={checkingOut}
-            >
-              {checkingOut ? 'Procesando...' : isAuthenticated ? '💳 Confirmar Compra' : '🔑 Iniciar Sesión para Comprar'}
-            </button>
+            {!showCardForm && (
+              <button onClick={handleCheckout} className="btn-primary" style={{ width: '100%', padding: '1rem' }}>
+                {isAuthenticated ? '💳 Confirmar Compra' : '🔑 Iniciar Sesión para Comprar'}
+              </button>
+            )}
 
             <Link to="/products" style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--primary-color)' }}>
               Seguir Comprando
