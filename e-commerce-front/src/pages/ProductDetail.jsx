@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux'; // 👈 Agregamos Redux
 import api from '../services/api';
-import { useCart } from '../context/CartContext';
+import { addToCart } from '../store/cartSlice'; // 👈 Importamos la acción de Redux
 
 // 📸 FALLBACK ABSOLUTO (Por si algún modelo no se encuentra)
 const IMAGEN_GENERICA = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&auto=format&fit=crop&q=80";
@@ -141,7 +142,7 @@ const IMAGENES_POR_MODELO = {
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const dispatch = useDispatch(); // 👈 Inicializamos el despachador de Redux
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -175,11 +176,12 @@ const ProductDetail = () => {
   const handleAddToCart = async () => {
     if (!product || product.stock <= 0) return;
     setAdding(true);
-    const success = await addToCart(product, quantity);
+    
+    // 🧠 Despachamos directo a Redux mandando el objeto idéntico a lo que espera tu Slice
+    dispatch(addToCart({ product, quantity })); 
+    
     setAdding(false);
-    if (success) {
-      navigate('/cart');
-    }
+    navigate('/cart');
   };
 
   if (loading) {

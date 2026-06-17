@@ -46,7 +46,6 @@ const Home = () => {
           Explora los últimos productos electrónicos con el mejor soporte y entrega inmediata. Diseñado para tu comodidad.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          {/* Al hacer clic acá, viaja a /products y carga las listas separadas */}
           <Link to="/products" className="btn-primary" style={{ padding: '1rem 2.5rem', borderRadius: '50px' }}>
             Explorar Catálogo 🚀
           </Link>
@@ -62,13 +61,14 @@ const Home = () => {
           gap: '1.5rem'
         }}>
           {[
-            /* 👇 Modificado: Nombre y slug adaptados a las descripciones reales de tu base de datos */
-            { name: 'Hogar', icon: '🏠', slug: 'Hogar', desc: 'Aires acondicionados, confort y hogar' },
-            { name: 'Tecnología', icon: '💻', slug: 'Tecnologia', desc: 'Computadoras, tablets y gadgets' },
-            { name: 'Audio', icon: '🎧', slug: 'Audio', desc: 'Auriculares, parlantes y sonido' },
-            { name: 'Electrodomésticos', icon: '🔌', slug: 'Electrodomesticos', desc: 'Cocina y artículos eléctricos' }
+            /* IDs ajustados según tu data_maestra */
+            { name: 'Hogar', icon: '🏠', id: 2, desc: 'Aires acondicionados, confort y hogar' },
+            { name: 'Tecnología', icon: '💻', id: 1, desc: 'Computadoras, tablets y gadgets' },
+            { name: 'Audio', icon: '🎧', id: 1, desc: 'Auriculares, parlantes y sonido' },
+            { name: 'Electrodomésticos', icon: '🔌', id: 2, desc: 'Cocina y artículos eléctricos' },
+            { name: 'Indumentaria', icon: '👕', id: 3, desc: 'Zapatillas, remeras y accesorios' }
           ].map((cat) => (
-            <Link key={cat.slug} to={`/products?categoria=${cat.slug}`} className="glass-card" style={{
+            <Link key={cat.name} to={`/products?categoria=${cat.id}`} className="glass-card" style={{
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
