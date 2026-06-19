@@ -1,10 +1,16 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+
   const location = useLocation();
+
+  const {
+    isAuthenticated,
+    loading
+  } = useSelector((state) => state.auth);
+
 
   if (loading) {
     return (
@@ -22,10 +28,17 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
+
   if (!isAuthenticated) {
-    // Redirigimos al login pero guardamos la ubicación previa para volver después de loguearse
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: location }}
+        replace
+      />
+    );
   }
+
 
   return children;
 };

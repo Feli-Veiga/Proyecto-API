@@ -1,175 +1,133 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useCart } from '../../context/CartContext';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../../store/authSlice';
 
 const Header = () => {
-  const { isAuthenticated, user, logout } = useAuth();
-  const { cartItems } = useCart();
-  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
-  const handleSearch = (e) => {
+  // Sincronizamos el buscador con lo que haya en la URL por si limpian la búsqueda
+  const queryParams = new URLSearchParams(location.search);
+  const [searchTerm, setSearchTerm] = useState(queryParams.get('q') || '');
+
+  useEffect(() => {
+    setSearchTerm(queryParams.get('q') || '');
+  }, [location.search]);
+
+  // Traemos los estados desde Redux
+  const auth = useSelector((state) => state.auth) || {};
+  const cart = useSelector((state) => state.cart) || {};
+  
+  const isAuthenticated = auth.isAuthenticated;
+  const user = auth.user;
+  const cartItems = cart.cartItems || [];
+  const totalItems = cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
+
+  // Función para manejar la búsqueda
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?q=${encodeURIComponent(searchQuery.trim())}`);
+    if (searchTerm.trim()) {
+      navigate(`/products?q=${encodeURIComponent(searchTerm.trim())}`);
+    } else {
+      navigate('/products');
     }
   };
 
-  // Cuenta total de unidades en el carrito (ej. 2 de producto A + 1 de producto B = 3)
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const handleLogoutClick = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
 
   return (
     <header style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      background: 'hsla(240, 20%, 8%, 0.75)',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid var(--border-color)',
+      width: '100%',
+      backgroundColor: 'hsl(240, 15%, 10%)',
+      borderBottom: '1px solid var(--border-color, #2a2a30)',
       padding: '1rem 2rem',
+      display: 'block'
     }}>
-      <div style={{
-        maxWidth: '1200px',
+      <div className="flex-between" style={{ 
+        maxWidth: '1200px', 
         margin: '0 auto',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '1.5rem',
+        gap: '2rem',
         flexWrap: 'wrap'
       }}>
+        
         {/* Logo */}
-        <Link to="/" style={{
-          fontSize: '1.5rem',
-          fontWeight: 700,
-          background: 'linear-gradient(135deg, var(--primary-color) 0%, #a855f7 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          letterSpacing: '-0.5px'
-        }}>
-          UADE E-commerce
+        <Link to="/" style={{ textDecoration: 'none', color: 'var(--primary-color, #3b82f6)', fontSize: '1.5rem', fontWeight: 800, whiteSpace: 'nowrap' }}>
+          🚀 UADE E-Commerce
         </Link>
 
-        {/* Buscador */}
-        <form onSubmit={handleSearch} style={{
-          flex: '1',
-          maxWidth: '500px',
-          minWidth: '200px',
-          position: 'relative'
-        }}>
+        {/* 🔍 BARRA DE BÚSQUEDA RECUPERADA */}
+        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', flex: 1, maxWidth: '500px', minWidth: '260px' }}>
           <input
             type="text"
-            placeholder="Buscar productos..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            className="form-input"
+            placeholder="¿Qué estás buscando?..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             style={{
-              width: '100%',
-              background: 'hsl(240, 12%, 12%)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '50px',
-              padding: '0.6rem 1.2rem',
-              color: 'var(--text-primary)',
-              fontSize: '0.95rem',
-              paddingRight: '3rem',
-              transition: 'var(--transition-smooth)'
+              borderTopRightRadius: '0px',
+              borderBottomRightRadius: '0px',
+              backgroundColor: 'hsl(240, 20%, 6%)',
+              height: '40px'
             }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
-            onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
           />
-          <button type="submit" style={{
-            position: 'absolute',
-            right: '12px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            fontSize: '1.1rem'
+          <button type="submit" className="btn-primary" style={{
+            borderTopLeftRadius: '0px',
+            borderBottomLeftRadius: '0px',
+            padding: '0 1.25rem',
+            height: '40px',
+            cursor: 'pointer'
           }}>
-            🔍
+            Buscar
           </button>
         </form>
 
-        {/* Navegación y Auth */}
-        <nav style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1.5rem'
-        }}>
-          <Link to="/products" style={{
-            color: 'var(--text-secondary)',
-            fontWeight: 500,
-            fontSize: '0.95rem'
-          }} onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
-             onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}>
-            Productos
+        {/* Links y Perfil */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <Link to="/products" style={{ textDecoration: 'none', color: '#ffffff', fontWeight: 500 }}>
+            Catálogo
           </Link>
-
-          {/* Carrito */}
-          <Link to="/cart" style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            color: 'var(--text-primary)',
-            background: 'var(--surface-color)',
-            border: '1px solid var(--border-color)',
-            padding: '0.5rem 1rem',
-            borderRadius: '50px',
-            fontSize: '0.9rem',
-            fontWeight: 500
-          }}>
+          
+          <Link to="/cart" style={{ textDecoration: 'none', color: '#ffffff', fontWeight: 500, position: 'relative', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             🛒 Carrito
-            {cartCount > 0 && (
+            {totalItems > 0 && (
               <span style={{
-                background: 'var(--primary-color)',
+                position: 'absolute', 
+                top: '-10px', 
+                right: '-15px',
+                backgroundColor: 'var(--primary-color, #3b82f6)', 
                 color: 'white',
+                fontSize: '0.75rem', 
+                padding: '2px 6px', 
                 borderRadius: '50%',
-                padding: '2px 6px',
-                fontSize: '0.75rem',
-                fontWeight: 'bold',
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                border: '2px solid var(--bg-color)',
-                minWidth: '20px',
-                textAlign: 'center'
+                fontWeight: 'bold'
               }}>
-                {cartCount}
+                {totalItems}
               </span>
             )}
           </Link>
 
-          {/* Autenticación */}
+          <span style={{ color: '#4a4a52' }}>|</span>
+
           {isAuthenticated ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{
-                color: 'var(--text-secondary)',
-                fontSize: '0.85rem',
-                borderRight: '1px solid var(--border-color)',
-                paddingRight: '1rem'
-              }}>
-                👤 {user?.email}
+              <span style={{ fontSize: '0.9rem', color: '#cccccc' }}>
+                Hola, <strong style={{ color: '#ffffff' }}>{user?.email?.split('@')[0]}</strong>
               </span>
-              <button onClick={logout} style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--error-color)',
-                cursor: 'pointer',
-                fontWeight: 500,
-                fontSize: '0.95rem'
-              }}>
+              <button onClick={handleLogoutClick} className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', cursor: 'pointer' }}>
                 Salir
               </button>
             </div>
           ) : (
-            <Link to="/login" className="btn-primary" style={{
-              padding: '0.5rem 1.2rem',
-              borderRadius: '50px',
-              fontSize: '0.9rem'
-            }}>
-              Ingresar
+            <Link to="/login" className="btn-primary" style={{ padding: '0.5rem 1rem', textDecoration: 'none', fontSize: '0.9rem' }}>
+              Iniciar Sesión
             </Link>
           )}
         </nav>
