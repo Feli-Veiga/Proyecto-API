@@ -1,107 +1,283 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../services/api';
 
-const token = localStorage.getItem('token');
-const savedAuth = localStorage.getItem('isAuthenticated') === 'true';
+
+const tokenStorage = localStorage.getItem('token');
 
 const initialState = {
-  user: token && savedAuth ? { email: localStorage.getItem('userEmail') || 'usuario@uade.edu.ar' } : null,
-  isAuthenticated: !!(token && savedAuth),
-  loading: false,
-  error: null
+
+  user: localStorage.getItem('userEmail')
+    ? {
+        email: localStorage.getItem('userEmail')
+      }
+    : null,
+
+
+  token: tokenStorage || null,
+
+
+  isAuthenticated: !!tokenStorage,
+
+
+  loading:false,
+  error:null
 };
 
-// AsyncThunk para el Login
+
+
+
+// LOGIN
+
 export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await api.post('/api/auth/login', credentials);
-      if (response.data && response.data.token) {
-        const { token } = response.data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userEmail', credentials.email);
-        
-        return { email: credentials.email };
-      } else {
-        throw new Error('No se recibió el token de acceso');
-      }
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Credenciales inválidas. Por favor intente de nuevo.');
-    }
-  }
+'auth/loginUser',
+
+async(credentials,{rejectWithValue})=>{
+
+
+try{
+
+const response =
+await api.post('/api/auth/login',credentials);
+
+
+
+if(response.data?.token){
+
+const token=response.data.token;
+
+
+localStorage.setItem(
+'token',
+token
 );
 
-// AsyncThunk para el Registro (con Login automático)
-export const registerUser = createAsyncThunk(
-  'auth/registerUser',
-  async (userData, { dispatch, rejectWithValue }) => {
-    try {
-      const response = await api.post('/api/usuarios', userData);
-      if (response.data) {
-        // Ejecuta el login automático si el registro fue exitoso
-        const loginResult = await dispatch(loginUser({ email: userData.email, password: userData.password }));
-        if (loginUser.fulfilled.match(loginResult)) {
-          return loginResult.payload;
-        } else {
-          return rejectWithValue(loginResult.payload);
-        }
-      }
-      return rejectWithValue('Error al registrar el usuario.');
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Error al registrar el usuario.');
-    }
-  }
+localStorage.setItem(
+'isAuthenticated',
+'true'
 );
 
-const authSlice = createSlice({
-  name: 'auth',
-  initialState,
-  reducers: {
-    logout: (state) => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('carritoId');
-      state.user = null;
-      state.isAuthenticated = false;
-      state.error = null;
-    },
-    clearAuthError: (state) => {
-      state.error = null;
-    }
-  },
-  extraReducers: (builder) => {
-    builder
-      // Login Hooks
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      // Register Hooks
-      .addCase(registerUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      });
-  }
+
+localStorage.setItem(
+'userEmail',
+credentials.email
+);
+
+
+
+return {
+
+user:{
+email:credentials.email
+},
+
+token
+
+};
+
+
+}
+
+
+throw new Error();
+
+
+}
+catch(err){
+
+return rejectWithValue(
+err.response?.data?.message ||
+'Credenciales inválidas'
+);
+
+}
+
 });
 
-export const { logout, clearAuthError } = authSlice.actions;
+
+
+
+// REGISTER
+
+export const registerUser = createAsyncThunk(
+'auth/registerUser',
+
+async(userData,{dispatch,rejectWithValue})=>{
+
+
+try{
+
+
+const response =
+await api.post('/api/usuarios',userData);
+
+
+
+if(response.data){
+
+
+const result =
+await dispatch(
+loginUser({
+email:userData.email,
+password:userData.password
+})
+);
+
+
+
+if(loginUser.fulfilled.match(result)){
+
+return result.payload;
+
+}
+
+
+return rejectWithValue(result.payload);
+
+}
+
+
+}
+catch(err){
+
+return rejectWithValue(
+err.response?.data?.message ||
+'Error registrando usuario'
+);
+
+}
+
+});
+
+
+
+
+
+const authSlice=createSlice({
+
+name:'auth',
+
+initialState,
+
+
+reducers:{
+
+
+logout:(state)=>{
+
+
+localStorage.removeItem('token');
+localStorage.removeItem('isAuthenticated');
+localStorage.removeItem('userEmail');
+localStorage.removeItem('carritoId');
+
+
+state.user=null;
+state.token=null;
+state.isAuthenticated=false;
+state.error=null;
+
+
+},
+
+
+clearAuthError:(state)=>{
+
+state.error=null;
+
+}
+
+},
+
+
+
+extraReducers:(builder)=>{
+
+
+builder
+
+
+
+.addCase(loginUser.pending,(state)=>{
+
+state.loading=true;
+state.error=null;
+
+})
+
+
+.addCase(loginUser.fulfilled,(state,action)=>{
+
+state.loading=false;
+
+state.isAuthenticated=true;
+
+state.user=action.payload.user;
+
+state.token=action.payload.token;
+
+
+})
+
+
+.addCase(loginUser.rejected,(state,action)=>{
+
+state.loading=false;
+
+state.error=action.payload;
+
+})
+
+
+
+
+// register
+
+
+.addCase(registerUser.pending,(state)=>{
+
+state.loading=true;
+state.error=null;
+
+})
+
+
+.addCase(registerUser.fulfilled,(state,action)=>{
+
+state.loading=false;
+
+
+state.user=action.payload.user;
+
+state.token=action.payload.token;
+
+state.isAuthenticated=true;
+
+
+})
+
+
+.addCase(registerUser.rejected,(state,action)=>{
+
+state.loading=false;
+
+state.error=action.payload;
+
+})
+
+
+}
+
+});
+
+
+
+
+export const {
+logout,
+clearAuthError
+}=authSlice.actions;
+
+
+
 export default authSlice.reducer;
