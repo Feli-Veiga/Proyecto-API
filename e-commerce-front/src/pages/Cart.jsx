@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeFromCart, clearCart, checkoutCart } from '../store/cartSlice';
+import { getProductImage } from '../utils/productImage';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const Cart = () => {
     }
 
     const resultAction = await dispatch(checkoutCart({
-      usuarioId: 1,
+      usuarioId: user?.id ?? null,
       email: user?.email,
       ...paymentData
     }));
@@ -84,7 +85,7 @@ const Cart = () => {
           <div key={item.id} className="glass-card flex-between" style={{ padding: '1rem' }}>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <div style={{ width: '60px', height: '60px', backgroundColor: 'var(--border-color)', borderRadius: '8px', overflow: 'hidden' }}>
-                <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=100" alt={item.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={getProductImage(item.nombre)} alt={item.nombre} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
               <div>
                 <h4 style={{ margin: 0 }}>{item.nombre}</h4>

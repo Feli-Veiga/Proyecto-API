@@ -19,6 +19,7 @@ import Login from './pages/Login';
 
 
 import ProtectedRoute from './components/ProtectedRoute';
+import CreateProduct from './pages/CreateProduct';
 
 
 import './App.css';
@@ -71,7 +72,11 @@ element={
 
 <Route path="/login" element={<Login/>}/>
 
-
+<Route path="/crear-producto" element={
+  <ProtectedRoute>
+    <CreateProduct/>
+  </ProtectedRoute>
+}/>
 
 <Route path="*" element={<Navigate to="/" replace/>}/>
 

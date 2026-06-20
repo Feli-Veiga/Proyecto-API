@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 // @Data es una anotación de Lombok que genera automáticamente getters, setters, toString, equals y hashCode
 // @Entity indica que esta clase es una entidad de JPA, lo que permite mapearla a una tabla en la base de datos
@@ -51,6 +52,7 @@ public class Usuario {
     // Un usuario puede tener muchos productos
     // @OneToMany -> relación uno a muchos
     // mappedBy -> indica que la relación la maneja el campo "usuario" en Producto
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario")
     private List<Producto> productos;
 }

@@ -118,6 +118,9 @@ const Header = () => {
 
           {isAuthenticated ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <Link to="/crear-producto" className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', textDecoration: 'none' }}>
+                + Producto
+              </Link>
               <span style={{ fontSize: '0.9rem', color: '#cccccc' }}>
                 Hola, <strong style={{ color: '#ffffff' }}>{user?.email?.split('@')[0]}</strong>
               </span>

@@ -175,6 +175,7 @@ public class UsuarioService {
 
         LoginResponse response = new LoginResponse();
         response.setToken(token);
+        response.setUserId(usuario.getId());
 
         return response;
     }
